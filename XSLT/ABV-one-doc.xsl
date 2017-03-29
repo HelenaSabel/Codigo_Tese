@@ -3,19 +3,31 @@
     xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     exclude-result-prefixes="xs" version="2.0">
     <xsl:output method="xml" indent="yes"/>
+    
+    <!--Cria-se uma variável por cada um dos testemunhos que contem
+    as transcrições destes-->
+    
     <xsl:variable name="A"
         select="//div[@wit = '#A']"/>
     <xsl:variable name="B"
         select="//div[@wit = '#B']"/>
     <xsl:variable name="V"
         select="//div[@wit = '#V']"/>
+    
     <xsl:template match="/">
-        <xsl:result-document href="ABV2.xml">
+        <xsl:result-document href="corpus-em-paralelo.xml">
+            
+        <!-- Aplicarão-se regras de transformação apenas a aquelas transcrições
+        que estiverem presentes nos três testemunhos -->
+            
             <xsl:element name="tei">
                 <xsl:apply-templates select="//$A[@corresp = $B/@corresp][@corresp = $V/@corresp]"/>
             </xsl:element>
         </xsl:result-document>
     </xsl:template>
+    
+        <!--Cria-se um contentor <div> por cada cantiga -->
+    
     <xsl:template match="div">
         <xsl:element name="div">
             <xsl:attribute name="type">poem</xsl:attribute>
@@ -23,9 +35,16 @@
             <xsl:apply-templates/>
         </xsl:element>
     </xsl:template>
+    
+        <!-- Cria-se um elemento <l> por cada verso -->
+    
     <xsl:template match="l">
         <xsl:element name="l">
             <xsl:attribute name="n" select="count(preceding-sibling::l) + 1"/>
+            
+        <!--  Abre-se o aparato de variantes, criando um elemento <rdg> por cada 
+        testemunho -->
+            
             <xsl:element name="app">
                 <xsl:element name="rdg">
                     <xsl:attribute name="wit">#A</xsl:attribute>
